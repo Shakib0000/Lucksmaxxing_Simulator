@@ -5,10 +5,12 @@ import javax.swing.JPanel;
 
 class DrawPanel extends JPanel implements MouseListener {
     private Rectangle button;
+    private Rarities rarities;
     public DrawPanel() {
         button = new Rectangle(375, 200, 200, 30);
         this.addMouseListener(this);
         this.setBackground(Color.BLACK);
+        rarities = new Rarities();
     }
 
     protected void paintComponent(Graphics g) {
@@ -32,7 +34,8 @@ class DrawPanel extends JPanel implements MouseListener {
 
         if (e.getButton() == 1) {
             if (button.contains(clicked)) {
-                System.out.println("Left Click");
+                System.out.println(rarities.getRarities());
+
             } else if (!button.contains(clicked)) {
                 System.out.println("N");
             }
