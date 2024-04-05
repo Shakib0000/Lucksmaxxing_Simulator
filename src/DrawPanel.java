@@ -6,6 +6,8 @@ import javax.swing.JPanel;
 class DrawPanel extends JPanel implements MouseListener {
     private Rectangle button;
     private Rarities rarities;
+    private Rarity rolledRarity;
+
     public DrawPanel() {
         button = new Rectangle(375, 200, 200, 30);
         this.addMouseListener(this);
@@ -19,6 +21,11 @@ class DrawPanel extends JPanel implements MouseListener {
         g.setColor(Color.white);
         g.drawString("Test your luck!", 386, 221);
         g.drawRect((int)button.getX(), (int)button.getY(), (int)button.getWidth(), (int)button.getHeight());
+        if (rolledRarity != null) {
+            g.setColor(rolledRarity.getColor());
+            g.setFont(new Font(rolledRarity.getFontInfo().getName(), rolledRarity.getFontInfo().getStyle(), rolledRarity.getFontInfo().getSize()));
+            g.drawString(rolledRarity.getName(), rolledRarity.getxPos(), rolledRarity.getyPos());
+        }
     }
 
     public void mouseReleased(MouseEvent e) { }
@@ -34,10 +41,10 @@ class DrawPanel extends JPanel implements MouseListener {
 
         if (e.getButton() == 1) {
             if (button.contains(clicked)) {
-                System.out.println(rarities.getRarities());
+                rolledRarity = rarities.getRarities().get(0);
 
             } else if (!button.contains(clicked)) {
-                System.out.println("N");
+                rolledRarity = null;
             }
         }
     }
