@@ -7,12 +7,14 @@ class DrawPanel extends JPanel implements MouseListener {
     private Rectangle button;
     private Rarities rarities;
     private Rarity rolledRarity;
+    private double luck;
 
     public DrawPanel() {
         button = new Rectangle(375, 200, 200, 30);
         this.addMouseListener(this);
         this.setBackground(Color.BLACK);
         rarities = new Rarities();
+        luck = 1;
     }
 
     protected void paintComponent(Graphics g) {
@@ -41,7 +43,7 @@ class DrawPanel extends JPanel implements MouseListener {
 
         if (e.getButton() == 1) {
             if (button.contains(clicked)) {
-                rolledRarity = rarities.getRarities().get((int) (Math.random() * rarities.getRarities().size()));
+                rolledRarity = rarities.generateRandomRarity(luck);
 
             } else if (!button.contains(clicked)) {
                 // do nothing for now

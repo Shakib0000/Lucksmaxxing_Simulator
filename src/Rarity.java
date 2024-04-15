@@ -6,9 +6,9 @@ public class Rarity {
     private String name;
     private Color color;
     private Font fontInfo;
-    private double chance;
+    private int chance;
 
-    public Rarity(int xPos, int yPos, String name, Color color, Font fontInfo, double chance) {
+    public Rarity(int xPos, int yPos, String name, Color color, Font fontInfo, int chance) {
         this.xPos = xPos;
         this.yPos = yPos;
         this.name = name;
@@ -37,7 +37,7 @@ public class Rarity {
         return fontInfo;
     }
 
-    public double getChance() {
+    public int getChance() {
         return chance;
     }
 }
