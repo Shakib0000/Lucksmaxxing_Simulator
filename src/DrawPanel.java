@@ -22,6 +22,7 @@ class DrawPanel extends JPanel implements MouseListener {
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
         g.setColor(Color.white);
         g.drawString("Test your luck!", 386, 221);
+        g.drawString("Luck: " + luck, 10, 25);
         g.drawRect((int)button.getX(), (int)button.getY(), (int)button.getWidth(), (int)button.getHeight());
         if (rolledRarity != null) {
             g.setColor(rolledRarity.getColor());
