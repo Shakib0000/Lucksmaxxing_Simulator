@@ -58,6 +58,24 @@ public class Rarities {
         return str;
     }
 
+    public String raritySimulation(double luck, int times, String specificRarity) {
+        int[] rarityCounts = new int[rarities.size()];
+        for (int i = 0; i < times; i++) {
+            Rarity rarity = generateRandomRarity(luck);
+            for (int j = 0; j < rarities.size(); j++) {
+                if (rarities.get(j).getName().equals(rarity.getName())) {
+                    rarityCounts[j]++;
+                }
+            }
+        }
+        for (int i = 0; i < rarities.size(); i++) {
+            if (rarities.get(i).getName().equals(specificRarity)) {
+                return ((double) (rarityCounts[i])/times) * 100 + "%";
+            }
+        }
+        return "Not found";
+    }
+
     public static ArrayList<Rarity> getRarities() {
         return rarities;
     }

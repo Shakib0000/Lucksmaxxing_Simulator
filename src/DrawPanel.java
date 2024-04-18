@@ -25,6 +25,12 @@ class DrawPanel extends JPanel implements MouseListener {
         g.drawString("Test your luck!", 386, 221);
         g.drawString("Luck: " + luck, 10, 25);
         g.drawRect((int)button.getX(), (int)button.getY(), (int)button.getWidth(), (int)button.getHeight());
+        for (int i = 0; i < Rarities.getRarities().size(); i++) {
+            g.setColor(Rarities.getRarities().get(i).getColor());
+            g.setFont(new Font("Courier New", Font.PLAIN, 20));
+            // temporarily displays chance variable for now, will display the actual percentage to get the rarity soon
+            g.drawString(Rarities.getRarities().get(i).getName() + ": " + Rarities.getRarities().get(i).getChance(), 800, 10 + 20*(i+1));
+        }
         if (rolledRarity != null) {
             g.setColor(rolledRarity.getColor());
             g.setFont(new Font(rolledRarity.getFontInfo().getName(), rolledRarity.getFontInfo().getStyle(), rolledRarity.getFontInfo().getSize()));
@@ -51,6 +57,7 @@ class DrawPanel extends JPanel implements MouseListener {
         if (e.getButton() == 1) {
             if (button.contains(clicked)) {
                 System.out.println(rarities.raritySimulation(luck, 1000000));
+                System.out.println(rarities.raritySimulation(luck, 1000000, "Moonstone"));
                 rolledRarity = rarities.generateRandomRarity(luck);
                 if (highestRolledRarity == null) {
                     highestRolledRarity = rolledRarity;
