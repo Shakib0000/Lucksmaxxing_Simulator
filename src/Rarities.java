@@ -41,6 +41,23 @@ public class Rarities {
         return new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), 1);
     }
 
+    public String raritySimulation(double luck, int times) {
+        String str = "";
+        int[] rarityCounts = new int[rarities.size()];
+        for (int i = 0; i < times; i++) {
+            Rarity rarity = generateRandomRarity(luck);
+            for (int j = 0; j < rarities.size(); j++) {
+                if (rarities.get(j).getName().equals(rarity.getName())) {
+                    rarityCounts[j]++;
+                }
+            }
+        }
+        for (int i = 0; i < rarities.size(); i++) {
+            str += rarities.get(i).getName() + ": " + rarityCounts[i] + " times or " + Math.round(((double) (rarityCounts[i])/times) * 100) + "%\n";
+        }
+        return str;
+    }
+
     public static ArrayList<Rarity> getRarities() {
         return rarities;
     }
