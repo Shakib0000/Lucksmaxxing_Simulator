@@ -50,6 +50,7 @@ class DrawPanel extends JPanel implements MouseListener {
 
         if (e.getButton() == 1) {
             if (button.contains(clicked)) {
+                System.out.println(rarities.raritySimulation(luck, 1000000));
                 rolledRarity = rarities.generateRandomRarity(luck);
                 if (highestRolledRarity == null) {
                     highestRolledRarity = rolledRarity;
