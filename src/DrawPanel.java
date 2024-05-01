@@ -9,6 +9,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private Rarity rolledRarity;
     private Rarity highestRolledRarity;
     private double luck;
+    private int totalRolls;
 
     public DrawPanel() {
         button = new Rectangle(375, 200, 200, 30);
@@ -24,6 +25,7 @@ class DrawPanel extends JPanel implements MouseListener {
         g.setColor(Color.white);
         g.drawString("Test your luck!", 386, 221);
         g.drawString("Luck: " + luck, 10, 25);
+        g.drawString("Total rolls: " + totalRolls, 10, 65);
         g.drawRect((int)button.getX(), (int)button.getY(), (int)button.getWidth(), (int)button.getHeight());
         for (int i = 0; i < Rarities.getRarities().size(); i++) {
             g.setColor(Rarities.getRarities().get(i).getColor());
@@ -41,6 +43,11 @@ class DrawPanel extends JPanel implements MouseListener {
             g.setFont(new Font("Courier New", Font.PLAIN, 20));
             g.drawString("Rarest rarity obtained: " + highestRolledRarity.getName(), 10, 45);
         }
+        else {
+            g.setColor(new Color(255,255,255));
+            g.setFont(new Font("Courier New", Font.PLAIN, 20));
+            g.drawString("Rarest rarity obtained: None", 10, 45);
+        }
     }
 
     public void mouseReleased(MouseEvent e) { }
@@ -56,9 +63,10 @@ class DrawPanel extends JPanel implements MouseListener {
 
         if (e.getButton() == 1) {
             if (button.contains(clicked)) {
-                System.out.println(rarities.raritySimulation(luck, 1000000));
-                System.out.println(rarities.raritySimulation(luck, 1000000, "Moonstone"));
+                //System.out.println(rarities.raritySimulation(luck, 1000000));
+                //System.out.println(rarities.raritySimulation(luck, 1000000, "Moonstone"));
                 rolledRarity = rarities.generateRandomRarity(luck);
+                totalRolls++;
                 if (highestRolledRarity == null) {
                     highestRolledRarity = rolledRarity;
                 }
