@@ -10,6 +10,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private Rarity highestRolledRarity;
     private double luck;
     private int totalRolls;
+    private int totalRollsForHighestRarity;
 
     public DrawPanel() {
         button = new Rectangle(375, 200, 200, 30);
@@ -41,7 +42,7 @@ class DrawPanel extends JPanel implements MouseListener {
         if (highestRolledRarity != null) {
             g.setColor(highestRolledRarity.getColor());
             g.setFont(new Font("Courier New", Font.PLAIN, 20));
-            g.drawString("Rarest rarity obtained: " + highestRolledRarity.getName(), 10, 45);
+            g.drawString("Rarest rarity obtained: " + highestRolledRarity.getName() + " (" + totalRollsForHighestRarity + ")", 10, 45);
         }
         else {
             g.setColor(new Color(255,255,255));
@@ -69,10 +70,12 @@ class DrawPanel extends JPanel implements MouseListener {
                 totalRolls++;
                 if (highestRolledRarity == null) {
                     highestRolledRarity = rolledRarity;
+                    totalRollsForHighestRarity = totalRolls;
                 }
                 else {
                     if (rolledRarity.getChance() > highestRolledRarity.getChance()) {
                         highestRolledRarity = rolledRarity;
+                        totalRollsForHighestRarity = totalRolls;
                     }
                 }
             } else if (!button.contains(clicked)) {
