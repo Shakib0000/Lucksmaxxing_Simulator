@@ -6,9 +6,11 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Rarities {
-    private static ArrayList<Rarity> rarities;
+    private ArrayList<Rarity> rarities;
+    private int luck;
 
-    public Rarities() {
+    public Rarities(int luck) {
+        this.luck = luck;
         rarities = new ArrayList<Rarity>();
         rarities.add(new Rarity(408, 180, "Bronze", new Color(150, 75, 0), new Font("Century Schoolbook", Font.PLAIN, 40), 3));
         rarities.add(new Rarity(420, 180, "Silver", new Color(192, 192, 192), new Font("Century Schoolbook", Font.PLAIN, 40), 4));
@@ -76,7 +78,33 @@ public class Rarities {
         return "Not found";
     }
 
-    public static ArrayList<Rarity> getRarities() {
+    public String[] raritySimulation(double luck, int times, boolean getPercentagesOnly) {
+        if (getPercentagesOnly) {
+            int[] rarityCounts = new int[rarities.size()];
+            String[] percentageList = new String[rarities.size()];
+            for (int i = 0; i < times; i++) {
+                Rarity rarity = generateRandomRarity(luck);
+                for (int j = 0; j < rarities.size(); j++) {
+                    if (rarities.get(j).getName().equals(rarity.getName())) {
+                        rarityCounts[j]++;
+                    }
+                }
+            }
+            for (int i = 0; i < percentageList.length; i++) {
+                percentageList[i] = String.format("%.2f", ((double) (rarityCounts[i]) / times) * 100) + "%";
+            }
+            return percentageList;
+        }
+        else {
+            return new String[0];
+        }
+    }
+
+    public int getLuck() {
+        return luck;
+    }
+
+    public ArrayList<Rarity> getRarities() {
         return rarities;
     }
 }
