@@ -9,7 +9,7 @@ public class Rarities {
     private ArrayList<Rarity> rarities;
     private int luck;
 
-    public Rarities(int luck) {
+    public Rarities(int luck) { // LEAST RARE TO MOST RARE
         this.luck = luck;
         rarities = new ArrayList<Rarity>();
         rarities.add(new Rarity(408, 180, "Bronze", new Color(150, 75, 0), new Font("Century Schoolbook", Font.PLAIN, 40), 3));
@@ -33,7 +33,7 @@ public class Rarities {
         boolean obtainedRarity = false;
         while (!obtainedRarity) {
             Rarity randomRarity = rarities.get((int) (Math.random() * rarities.size()));
-            int randomRarityCalculation = (int) ((Math.random() * ((int) randomRarity.getChance() / luck)) + 1);
+            int randomRarityCalculation = (int) ((Math.random() * ((int) randomRarity.getChance() - luck)) + 1);
             if (randomRarityCalculation == 1) {
                 obtainedRarity = true;
                 return randomRarity;
@@ -104,6 +104,10 @@ public class Rarities {
 
     public int getLuck() {
         return luck;
+    }
+
+    public void setLuck(int luck) {
+        this.luck = luck;
     }
 
     public ArrayList<Rarity> getRarities() {

@@ -6,7 +6,7 @@ public class Rarity {
     private String name;
     private Color color;
     private Font fontInfo;
-    private int chance;
+    private int chance; // not the actual chance, just a number to do calculations with
 
     public Rarity(int xPos, int yPos, String name, Color color, Font fontInfo, int chance) {
         this.xPos = xPos;
