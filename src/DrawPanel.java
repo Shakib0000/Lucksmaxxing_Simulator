@@ -4,7 +4,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 class DrawPanel extends JPanel implements MouseListener {
-    private Rectangle button;
+    private Rectangle testLuckButton;
+    private Rectangle updateChancesButton;
     private Rarities rarities;
     private Rarity rolledRarity;
     private Rarity highestRolledRarity;
@@ -14,7 +15,8 @@ class DrawPanel extends JPanel implements MouseListener {
     private final int STARTING_SIMULATION_TIMES = 1000000;
 
     public DrawPanel() {
-        button = new Rectangle(375, 200, 200, 30);
+        testLuckButton = new Rectangle(375, 200, 200, 30);
+        updateChancesButton = new Rectangle(770, 325, 200, 30);
         this.addMouseListener(this);
         this.setBackground(Color.BLACK);
         rarities = new Rarities(1);
@@ -28,11 +30,17 @@ class DrawPanel extends JPanel implements MouseListener {
         g.setFont(new Font("Courier New", Font.PLAIN, 20));
         g.setColor(Color.white);
         g.drawString("Test your luck!", 386, 221);
+        g.drawRect((int)testLuckButton.getX(), (int)testLuckButton.getY(), (int)testLuckButton.getWidth(), (int)testLuckButton.getHeight());
+
+        // Update chances button
+        g.setFont(new Font("Courier New", Font.PLAIN, 20));
+        g.setColor(Color.white);
+        g.drawString("UPDATE CHANCES", 785, 346);
+        g.drawRect((int)updateChancesButton.getX(), (int)updateChancesButton.getY(), (int)updateChancesButton.getWidth(), (int)updateChancesButton.getHeight());
 
         // Luck and total rolls display
         g.drawString("Luck: " + rarities.getLuck(), 10, 25);
         g.drawString("Total rolls: " + totalRolls, 10, 65);
-        g.drawRect((int)button.getX(), (int)button.getY(), (int)button.getWidth(), (int)button.getHeight());
 
         // Displaying rarity chances
         for (int i = 0; i < rarities.getRarities().size(); i++) {
@@ -82,7 +90,7 @@ class DrawPanel extends JPanel implements MouseListener {
         Point clicked = e.getPoint();
 
         if (e.getButton() == 1) {
-            if (button.contains(clicked)) {
+            if (testLuckButton.contains(clicked)) {
                 //System.out.println(rarities.raritySimulation(luck, 1000000));
                 //System.out.println(rarities.raritySimulation(luck, 1000000, "Moonstone"));
                 rolledRarity = rarities.generateRandomRarity(rarities.getLuck());
@@ -99,8 +107,11 @@ class DrawPanel extends JPanel implements MouseListener {
                         changeLuck(rarities.getLuck() + 5);
                     }
                 }
-            } else if (!button.contains(clicked)) {
+            } else if (!testLuckButton.contains(clicked)) {
                 // do nothing for now
+            }
+            if (updateChancesButton.contains(clicked)) {
+                rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
             }
         }
     }
