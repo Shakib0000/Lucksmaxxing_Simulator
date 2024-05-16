@@ -7,7 +7,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private Rectangle testLuckButton;
     private Rectangle updateChancesButton;
     private Rectangle chooseProgressionModeButton;
-    private Rectangle chooseSandboxModeButton;
+    private Rectangle chooseNormalModeButton;
     // private Rectangle socket; start on this next time
     private Rarities rarities;
     private Rarity rolledRarity;
@@ -24,37 +24,94 @@ class DrawPanel extends JPanel implements MouseListener {
         this.addMouseListener(this);
         this.setBackground(Color.BLACK);
         chooseProgressionModeButton = new Rectangle(100, 75, 250, 300);
-        chooseSandboxModeButton = new Rectangle(625, 75, 250, 300);
-        if (progressionModeEnabled && gamemodeChosen) {
-            testLuckButton = new Rectangle(375, 200, 200, 30);
-            updateChancesButton = new Rectangle(770, 325, 200, 30);
-            // socket = new Rectangle(100, 300); start on this next time
-            rarities = new Rarities(1);
-            rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
-        } else if (!progressionModeEnabled && gamemodeChosen) { // for sandbox mode, same as progression mode for now
-            testLuckButton = new Rectangle(375, 200, 200, 30);
-            updateChancesButton = new Rectangle(770, 325, 200, 30);
-            // socket = new Rectangle(100, 300); start on this next time
-            rarities = new Rarities(1);
-            rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
-        }
+        chooseNormalModeButton = new Rectangle(625, 75, 250, 300);
     }
 
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        // TITLE SCREEN
         if (!gamemodeChosen) {
-            g.setFont(new Font("Courier New", Font.PLAIN, 20));
+            g.setFont(new Font("Courier New", Font.PLAIN, 30));
             g.setColor(Color.white);
+
+            g.drawString("Welcome to Lucksmaxxing Simulator!", 200, 40);
+
+            g.drawString("CHOOSE", 430, 195);
+            g.drawString("YOUR", 448, 225);
+            g.drawString("GAMEMODE", 415, 255);
+
+            g.setFont(new Font("Courier New", Font.PLAIN, 20));
             g.drawString("PROGRESSION MODE", 125, 225);
             g.drawRect((int) chooseProgressionModeButton.getX(), (int) chooseProgressionModeButton.getY(), (int) chooseProgressionModeButton.getWidth(), (int) chooseProgressionModeButton.getHeight());
 
-            g.drawString("SANDBOX MODE", 675, 225);
-            g.drawRect((int) chooseSandboxModeButton.getX(), (int) chooseSandboxModeButton.getY(), (int) chooseSandboxModeButton.getWidth(), (int) chooseSandboxModeButton.getHeight());
+            g.drawString("NORMAL MODE", 680, 225);
+            g.drawRect((int) chooseNormalModeButton.getX(), (int) chooseNormalModeButton.getY(), (int) chooseNormalModeButton.getWidth(), (int) chooseNormalModeButton.getHeight());
         }
         else {
-            // Test luck button
+            // PROGRESSION MODE
             if (progressionModeEnabled) {
+                // Gamemode display
+                g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                g.setColor(Color.white);
+                g.drawString("GAMEMODE: PROGRESSION", 10, 450);
+
+                // Test luck button
+                g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                g.setColor(Color.white);
+                g.drawString("Test your luck!", 386, 221);
+                g.drawRect((int) testLuckButton.getX(), (int) testLuckButton.getY(), (int) testLuckButton.getWidth(), (int) testLuckButton.getHeight());
+
+                // Update chances button
+                g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                g.setColor(Color.white);
+                g.drawString("UPDATE CHANCES", 785, 346);
+                g.drawRect((int) updateChancesButton.getX(), (int) updateChancesButton.getY(), (int) updateChancesButton.getWidth(), (int) updateChancesButton.getHeight());
+
+                // Luck display and making sure luck doesn't exceed the maximum luck set by the program
+                if (rarities.getLuck() >= MAX_LUCK) {
+                    rarities.setLuck(MAX_LUCK);
+                    g.drawString("Luck: " + rarities.getLuck() + " (MAX)", 10, 25);
+                } else {
+                    g.drawString("Luck: " + rarities.getLuck(), 10, 25);
+                }
+
+                // Total rolls display
+                g.drawString("Total rolls: " + totalRolls, 10, 65);
+
+                // Displaying rarity chances
+                for (int i = 0; i < rarities.getRarities().size(); i++) {
+                    g.setColor(rarities.getRarities().get(i).getColor());
+                    g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                    g.drawString(rarities.getRarities().get(i).getName() + ": " + rarityPercentages[i], 775, 10 + 20 * (i + 1));
+                }
+
+                // Displaying currently rolled rarity
+                if (rolledRarity != null) {
+                    g.setColor(rolledRarity.getColor());
+                    g.setFont(new Font(rolledRarity.getFontInfo().getName(), rolledRarity.getFontInfo().getStyle(), rolledRarity.getFontInfo().getSize()));
+                    g.drawString(rolledRarity.getName(), rolledRarity.getxPos(), rolledRarity.getyPos());
+                }
+
+                // Displaying rarest rarity rolled
+                if (highestRolledRarity != null) {
+                    g.setColor(highestRolledRarity.getColor());
+                    g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                    g.drawString("Rarest rarity obtained: " + highestRolledRarity.getName() + " (" + totalRollsForHighestRarity + ")", 10, 45);
+                } else {
+                    g.setColor(new Color(255, 255, 255));
+                    g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                    g.drawString("Rarest rarity obtained: None", 10, 45);
+                }
+            }
+            // NORMAL MODE
+            else {
+                // Gamemode display
+                g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                g.setColor(Color.white);
+                g.drawString("GAMEMODE: NORMAL", 10, 450);
+
+                // Test luck button
                 g.setFont(new Font("Courier New", Font.PLAIN, 20));
                 g.setColor(Color.white);
                 g.drawString("Test your luck!", 386, 221);
@@ -127,8 +184,14 @@ class DrawPanel extends JPanel implements MouseListener {
                     rarities = new Rarities(1);
                     rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
                 }
-                else if (chooseSandboxModeButton.contains(clicked)) {
+                else if (chooseNormalModeButton.contains(clicked)) {
                     gamemodeChosen = true;
+                    progressionModeEnabled = false;
+                    testLuckButton = new Rectangle(375, 200, 200, 30);
+                    updateChancesButton = new Rectangle(770, 325, 200, 30);
+                    // socket = new Rectangle(100, 300); start on this next time
+                    rarities = new Rarities(1);
+                    rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
                 }
             }
             if (testLuckButton.contains(clicked)) {
