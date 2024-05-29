@@ -9,6 +9,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private Rectangle chooseProgressionModeButton;
     private Rectangle chooseNormalModeButton;
     private Rectangle[] sockets;
+    private int[] socketValues;
     private Rarities rarities;
     private Rarity rolledRarity;
     private Rarity highestRolledRarity;
@@ -19,12 +20,14 @@ class DrawPanel extends JPanel implements MouseListener {
     private final int MAX_LUCK = 100;
     private boolean gamemodeChosen;
     private boolean progressionModeEnabled;
+    private int currentGemIndexProgress;
 
     public DrawPanel() {
         this.addMouseListener(this);
         this.setBackground(Color.BLACK);
         chooseProgressionModeButton = new Rectangle(100, 75, 250, 300);
         chooseNormalModeButton = new Rectangle(625, 75, 250, 300);
+        socketValues = new int[8];
     }
 
     protected void paintComponent(Graphics g) {
@@ -80,7 +83,7 @@ class DrawPanel extends JPanel implements MouseListener {
                 g.drawString("Total rolls: " + totalRolls, 10, 65);
 
                 // Displaying rarity chances
-                for (int i = 0; i < rarities.getRarities().size(); i++) {
+                for (int i = 0; i < currentGemIndexProgress + 1; i++) {
                     g.setColor(rarities.getRarities().get(i).getColor());
                     g.setFont(new Font("Courier New", Font.PLAIN, 20));
                     g.drawString(rarities.getRarities().get(i).getName() + ": " + rarityPercentages[i], 775, 10 + 20 * (i + 1));
@@ -106,6 +109,12 @@ class DrawPanel extends JPanel implements MouseListener {
 
                 // Gem sockets
                 for (int i = 0; i < sockets.length; i++) {
+                    if (socketValues[i] == 1) {
+                        g.setColor(highestRolledRarity.getColor());
+                    }
+                    else {
+                        g.setColor(new Color(255, 255, 255));
+                    }
                     g.drawRect((int) sockets[i].getX(), (int) sockets[i].getY(), (int) sockets[i].getWidth(), (int) sockets[i].getHeight());
                 }
             }
@@ -167,6 +176,30 @@ class DrawPanel extends JPanel implements MouseListener {
         }
     }
 
+    public boolean socketsFull() {
+        for (int i = 0; i < socketValues.length; i++) {
+            if (socketValues[i] == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void emptySockets() {
+        for (int i = 0; i < socketValues.length; i++) {
+            socketValues[i] = 0;
+        }
+    }
+
+    public void fillSocket() {
+        for (int i = 0; i < socketValues.length; i++) {
+            if (socketValues[i] == 0) {
+                socketValues[i] = 1;
+                break;
+            }
+        }
+    }
+
     public void mouseReleased(MouseEvent e) { }
     public void mouseEntered(MouseEvent e) { }
     public void mouseExited(MouseEvent e) { }
@@ -189,11 +222,11 @@ class DrawPanel extends JPanel implements MouseListener {
                     rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
                     sockets = new Rectangle[8];
                     for (int i = 0; i < sockets.length; i++) {
-                        if (i % 2 != 0) {
+                        if (i % 2 == 0) {
                             sockets[i] = new Rectangle(60, i*30 + 100, 30, 30);
                         }
                         else {
-                            sockets[i] = new Rectangle(140, (i+1)*30 + 100, 30, 30);
+                            sockets[i] = new Rectangle(140, (i-1)*30 + 100, 30, 30);
                         }
                     }
                 }
@@ -209,25 +242,47 @@ class DrawPanel extends JPanel implements MouseListener {
             if (testLuckButton.contains(clicked)) {
                 //System.out.println(rarities.raritySimulation(luck, 1000000));
                 //System.out.println(rarities.raritySimulation(luck, 1000000, "Moonstone"));
-                rolledRarity = rarities.generateRandomRarity(rarities.getLuck());
-                totalRolls++;
-                rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
-                if (highestRolledRarity == null) { // No rarity has been rolled yet, therefore no highest rarity
-                    highestRolledRarity = rolledRarity;
-                    totalRollsForHighestRarity = totalRolls;
+                if (progressionModeEnabled) {
+                    rolledRarity = rarities.generateRandomRarity(rarities.getLuck(), currentGemIndexProgress);
+                    totalRolls++;
+                    rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
+                    if (highestRolledRarity == null) { // No rarity has been rolled yet, therefore no highest rarity
+                        highestRolledRarity = rolledRarity;
+                        totalRollsForHighestRarity = totalRolls;
+                        fillSocket();
+                    }
+                    else if (socketsFull() && rolledRarity.getChance() > highestRolledRarity.getChance()) { // New highest rarity
+                        highestRolledRarity = rolledRarity;
+                        totalRollsForHighestRarity = totalRolls;
+                        emptySockets();
+                        fillSocket();
+                    }
+                    else if (!socketsFull() && rolledRarity.equals(highestRolledRarity)) {
+                        fillSocket();
+                        if (socketsFull()) {
+                            currentGemIndexProgress++;
+                        }
+                    }
                 }
                 else {
-                    if (rolledRarity.getChance() > highestRolledRarity.getChance()) { // New highest rarity
+                    rolledRarity = rarities.generateRandomRarity(rarities.getLuck());
+                    totalRolls++;
+                    rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
+                    if (highestRolledRarity == null) { // No rarity has been rolled yet, therefore no highest rarity
                         highestRolledRarity = rolledRarity;
                         totalRollsForHighestRarity = totalRolls;
                     }
+                    else {
+                        if (rolledRarity.getChance() > highestRolledRarity.getChance()) { // New highest rarity
+                            highestRolledRarity = rolledRarity;
+                            totalRollsForHighestRarity = totalRolls;
+                        }
+                    }
                 }
-            } else if (!testLuckButton.contains(clicked)) {
-                // do nothing for now
             }
-            if (updateChancesButton.contains(clicked)) {
-                rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
-            }
+        }
+        if (updateChancesButton.contains(clicked)) {
+            rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
         }
     }
 }

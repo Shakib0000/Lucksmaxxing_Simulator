@@ -45,6 +45,20 @@ public class Rarities {
         return new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), 1);
     }
 
+    public Rarity generateRandomRarity(double luck, int currentGemIndexProgress) {
+        boolean obtainedRarity = false;
+        while (!obtainedRarity) {
+            Rarity randomRarity = rarities.get((int) (Math.random() * (currentGemIndexProgress + 1)));
+            int randomRarityCalculation = (int) ((Math.random() * ((int) randomRarity.getChance() - luck)) + 1);
+            if (randomRarityCalculation == 1) {
+                obtainedRarity = true;
+                return randomRarity;
+            }
+        }
+        // error?
+        return new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), 1);
+    }
+
     public String raritySimulation(double luck, int times) {
         String str = "";
         int[] rarityCounts = new int[rarities.size()];
