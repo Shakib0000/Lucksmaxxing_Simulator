@@ -8,6 +8,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private Rectangle updateChancesButton;
     private Rectangle chooseProgressionModeButton;
     private Rectangle chooseNormalModeButton;
+    private Rectangle rebirthButton;
     private Rectangle[] sockets;
     private int[] socketValues;
     private Rarities rarities;
@@ -70,6 +71,15 @@ class DrawPanel extends JPanel implements MouseListener {
                 g.setColor(Color.white);
                 g.drawString("UPDATE CHANCES", 785, 346);
                 g.drawRect((int) updateChancesButton.getX(), (int) updateChancesButton.getY(), (int) updateChancesButton.getWidth(), (int) updateChancesButton.getHeight());
+
+                // Rebirth button
+                if (highestRolledRarity != null && highestRolledRarity.getChance() / 20 > 0) {
+                    g.setFont(new Font("Courier New", Font.PLAIN, 18));
+                    g.setColor(Color.white);
+                    g.drawString("REBIRTH (+" + highestRolledRarity.getChance() / 20 + " rolls)", 378, 446);
+                    g.drawRect((int) rebirthButton.getX(), (int) rebirthButton.getY(), (int) rebirthButton.getWidth(), (int) rebirthButton.getHeight());
+                    g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                }
 
                 // Luck display and making sure luck doesn't exceed the maximum luck set by the program
                 if (rarities.getLuck() >= MAX_LUCK) {
@@ -218,6 +228,7 @@ class DrawPanel extends JPanel implements MouseListener {
                     progressionModeEnabled = true;
                     testLuckButton = new Rectangle(375, 200, 200, 30);
                     updateChancesButton = new Rectangle(770, 325, 200, 30);
+                    rebirthButton = new Rectangle(375, 425, 200, 30);
                     rarities = new Rarities(1);
                     rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
                     sockets = new Rectangle[8];
