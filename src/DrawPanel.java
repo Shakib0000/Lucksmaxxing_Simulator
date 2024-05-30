@@ -22,6 +22,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private boolean gamemodeChosen;
     private boolean progressionModeEnabled;
     private int currentGemIndexProgress;
+    private int numRollsPerClick;
 
     public DrawPanel() {
         this.addMouseListener(this);
@@ -29,6 +30,7 @@ class DrawPanel extends JPanel implements MouseListener {
         chooseProgressionModeButton = new Rectangle(100, 75, 250, 300);
         chooseNormalModeButton = new Rectangle(625, 75, 250, 300);
         socketValues = new int[8];
+        numRollsPerClick = 1;
     }
 
     protected void paintComponent(Graphics g) {
@@ -74,6 +76,7 @@ class DrawPanel extends JPanel implements MouseListener {
 
                 // Rebirth button
                 if (highestRolledRarity != null && highestRolledRarity.getChance() / 20 > 0) {
+                    rebirthButton = new Rectangle(375, 425, 200, 30);
                     g.setFont(new Font("Courier New", Font.PLAIN, 18));
                     g.setColor(Color.white);
                     g.drawString("REBIRTH (+" + highestRolledRarity.getChance() / 20 + " rolls)", 378, 446);
@@ -100,14 +103,14 @@ class DrawPanel extends JPanel implements MouseListener {
                 }
 
                 // Displaying currently rolled rarity
-                if (rolledRarity != null) {
+                if (rolledRarity != null && !rolledRarity.getName().equals("NULL")) {
                     g.setColor(rolledRarity.getColor());
                     g.setFont(new Font(rolledRarity.getFontInfo().getName(), rolledRarity.getFontInfo().getStyle(), rolledRarity.getFontInfo().getSize()));
                     g.drawString(rolledRarity.getName(), rolledRarity.getxPos(), rolledRarity.getyPos());
                 }
 
                 // Displaying rarest rarity rolled
-                if (highestRolledRarity != null) {
+                if (highestRolledRarity != null && !highestRolledRarity.getName().equals("NULL")) {
                     g.setColor(highestRolledRarity.getColor());
                     g.setFont(new Font("Courier New", Font.PLAIN, 20));
                     g.drawString("Rarest rarity obtained: " + highestRolledRarity.getName() + " (" + totalRollsForHighestRarity + ")", 10, 45);
@@ -228,7 +231,6 @@ class DrawPanel extends JPanel implements MouseListener {
                     progressionModeEnabled = true;
                     testLuckButton = new Rectangle(375, 200, 200, 30);
                     updateChancesButton = new Rectangle(770, 325, 200, 30);
-                    rebirthButton = new Rectangle(375, 425, 200, 30);
                     rarities = new Rarities(1);
                     rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
                     sockets = new Rectangle[8];
@@ -253,40 +255,38 @@ class DrawPanel extends JPanel implements MouseListener {
             if (testLuckButton.contains(clicked)) {
                 //System.out.println(rarities.raritySimulation(luck, 1000000));
                 //System.out.println(rarities.raritySimulation(luck, 1000000, "Moonstone"));
-                if (progressionModeEnabled) {
-                    rolledRarity = rarities.generateRandomRarity(rarities.getLuck(), currentGemIndexProgress);
-                    totalRolls++;
-                    rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
-                    if (highestRolledRarity == null) { // No rarity has been rolled yet, therefore no highest rarity
-                        highestRolledRarity = rolledRarity;
-                        totalRollsForHighestRarity = totalRolls;
-                        fillSocket();
-                    }
-                    else if (socketsFull() && rolledRarity.getChance() > highestRolledRarity.getChance()) { // New highest rarity
-                        highestRolledRarity = rolledRarity;
-                        totalRollsForHighestRarity = totalRolls;
-                        emptySockets();
-                        fillSocket();
-                    }
-                    else if (!socketsFull() && rolledRarity.equals(highestRolledRarity)) {
-                        fillSocket();
-                        if (socketsFull()) {
-                            currentGemIndexProgress++;
-                        }
-                    }
-                }
-                else {
-                    rolledRarity = rarities.generateRandomRarity(rarities.getLuck());
-                    totalRolls++;
-                    rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
-                    if (highestRolledRarity == null) { // No rarity has been rolled yet, therefore no highest rarity
-                        highestRolledRarity = rolledRarity;
-                        totalRollsForHighestRarity = totalRolls;
-                    }
-                    else {
-                        if (rolledRarity.getChance() > highestRolledRarity.getChance()) { // New highest rarity
+                for (int i = 0; i < numRollsPerClick; i++) {
+                    if (progressionModeEnabled) {
+                        rolledRarity = rarities.generateRandomRarity(rarities.getLuck(), currentGemIndexProgress);
+                        totalRolls++;
+                        rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
+                        if (highestRolledRarity == null || highestRolledRarity.getName().equals("NULL")) { // No rarity has been rolled yet, therefore no highest rarity
                             highestRolledRarity = rolledRarity;
                             totalRollsForHighestRarity = totalRolls;
+                            fillSocket();
+                        } else if (socketsFull() && rolledRarity.getChance() > highestRolledRarity.getChance()) { // New highest rarity
+                            highestRolledRarity = rolledRarity;
+                            totalRollsForHighestRarity = totalRolls;
+                            emptySockets();
+                            fillSocket();
+                        } else if (!socketsFull() && rolledRarity.equals(highestRolledRarity)) {
+                            fillSocket();
+                            if (socketsFull()) {
+                                currentGemIndexProgress++;
+                            }
+                        }
+                    } else {
+                        rolledRarity = rarities.generateRandomRarity(rarities.getLuck());
+                        totalRolls++;
+                        rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
+                        if (highestRolledRarity == null) { // No rarity has been rolled yet, therefore no highest rarity
+                            highestRolledRarity = rolledRarity;
+                            totalRollsForHighestRarity = totalRolls;
+                        } else {
+                            if (rolledRarity.getChance() > highestRolledRarity.getChance()) { // New highest rarity
+                                highestRolledRarity = rolledRarity;
+                                totalRollsForHighestRarity = totalRolls;
+                            }
                         }
                     }
                 }
@@ -294,6 +294,14 @@ class DrawPanel extends JPanel implements MouseListener {
         }
         if (updateChancesButton.contains(clicked)) {
             rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
+        }
+        if (rebirthButton != null && rebirthButton.contains(clicked)) {
+            numRollsPerClick += highestRolledRarity.getChance() / 20;
+            rarities.setLuck(1);
+            rolledRarity = new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), -1);
+            highestRolledRarity = new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), -1);
+            currentGemIndexProgress = 0;
+            emptySockets();
         }
     }
 }
