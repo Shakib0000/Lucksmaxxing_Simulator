@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import javax.swing.JPanel;
 
 class DrawPanel extends JPanel implements MouseListener {
@@ -12,6 +13,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private Rectangle[] sockets;
     private int[] socketValues;
     private Rarities rarities;
+    private ArrayList<Rarity> rebirthedRarities;
     private Rarity rolledRarity;
     private Rarity highestRolledRarity;
     private int totalRolls;
@@ -31,6 +33,7 @@ class DrawPanel extends JPanel implements MouseListener {
         chooseNormalModeButton = new Rectangle(625, 75, 250, 300);
         socketValues = new int[8];
         numRollsPerClick = 1;
+        rebirthedRarities = new ArrayList<Rarity>();
     }
 
     protected void paintComponent(Graphics g) {
@@ -75,7 +78,7 @@ class DrawPanel extends JPanel implements MouseListener {
                 g.drawRect((int) updateChancesButton.getX(), (int) updateChancesButton.getY(), (int) updateChancesButton.getWidth(), (int) updateChancesButton.getHeight());
 
                 // Rebirth button
-                if (highestRolledRarity != null && highestRolledRarity.getChance() / 20 > 0) {
+                if (highestRolledRarity != null && highestRolledRarity.getChance() / 20 > 0 && highestRolledRarity != rarities.getRarities().get(rarities.getRarities().size()-1) && !isDuplicateRebirth()) {
                     rebirthButton = new Rectangle(375, 425, 200, 30);
                     g.setFont(new Font("Courier New", Font.PLAIN, 18));
                     g.setColor(Color.white);
@@ -121,14 +124,19 @@ class DrawPanel extends JPanel implements MouseListener {
                 }
 
                 // Gem sockets
-                for (int i = 0; i < sockets.length; i++) {
-                    if (socketValues[i] == 1) {
-                        g.setColor(highestRolledRarity.getColor());
+                if (highestRolledRarity != rarities.getRarities().get(rarities.getRarities().size()-1)) {
+                    for (int i = 0; i < sockets.length; i++) {
+                        if (socketValues[i] == 1) {
+                            g.setColor(highestRolledRarity.getColor());
+                        } else {
+                            g.setColor(new Color(255, 255, 255));
+                        }
+                        g.drawRect((int) sockets[i].getX(), (int) sockets[i].getY(), (int) sockets[i].getWidth(), (int) sockets[i].getHeight());
                     }
-                    else {
-                        g.setColor(new Color(255, 255, 255));
-                    }
-                    g.drawRect((int) sockets[i].getX(), (int) sockets[i].getY(), (int) sockets[i].getWidth(), (int) sockets[i].getHeight());
+                }
+                else {
+                    g.drawString("Congratulations!", 90, 220);
+                    g.drawString("You rolled the highest rarity.", 10, 280);
                 }
             }
             // NORMAL MODE
@@ -213,6 +221,15 @@ class DrawPanel extends JPanel implements MouseListener {
         }
     }
 
+    public boolean isDuplicateRebirth() {
+        for (int i = 0; i < rebirthedRarities.size(); i++) {
+            if (highestRolledRarity == rebirthedRarities.get(i)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void mouseReleased(MouseEvent e) { }
     public void mouseEntered(MouseEvent e) { }
     public void mouseExited(MouseEvent e) { }
@@ -269,7 +286,7 @@ class DrawPanel extends JPanel implements MouseListener {
                             totalRollsForHighestRarity = totalRolls;
                             emptySockets();
                             fillSocket();
-                        } else if (!socketsFull() && rolledRarity.equals(highestRolledRarity)) {
+                        } else if (!socketsFull() && rolledRarity.equals(highestRolledRarity) && highestRolledRarity != rarities.getRarities().get(rarities.getRarities().size()-1)) {
                             fillSocket();
                             if (socketsFull()) {
                                 currentGemIndexProgress++;
@@ -295,13 +312,17 @@ class DrawPanel extends JPanel implements MouseListener {
         if (updateChancesButton.contains(clicked)) {
             rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
         }
-        if (rebirthButton != null && rebirthButton.contains(clicked)) {
-            numRollsPerClick += highestRolledRarity.getChance() / 20;
-            rarities.setLuck(1);
-            rolledRarity = new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), -1);
-            highestRolledRarity = new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), -1);
-            currentGemIndexProgress = 0;
-            emptySockets();
+        if (rebirthButton != null && rebirthButton.contains(clicked) && highestRolledRarity != rarities.getRarities().get(rarities.getRarities().size()-1)) {
+            if (!isDuplicateRebirth()) {
+                rebirthedRarities.add(highestRolledRarity);
+                numRollsPerClick += highestRolledRarity.getChance() / 20;
+                rarities.setLuck(1);
+                rolledRarity = new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), -1);
+                highestRolledRarity = new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), -1);
+                currentGemIndexProgress = 0;
+                emptySockets();
+                rebirthButton = null;
+            }
         }
     }
 }
