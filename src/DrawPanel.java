@@ -9,6 +9,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private Rectangle updateChancesButton;
     private Rectangle chooseProgressionModeButton;
     private Rectangle chooseNormalModeButton;
+    private Rectangle cheatModeButton;
     private Rectangle rebirthButton;
     private Rectangle[] sockets;
     private int[] socketValues;
@@ -23,6 +24,7 @@ class DrawPanel extends JPanel implements MouseListener {
     private final int MAX_LUCK = 100;
     private boolean gamemodeChosen;
     private boolean progressionModeEnabled;
+    private boolean cheatModeEnabled;
     private int currentGemIndexProgress;
     private int numRollsPerClick;
 
@@ -76,6 +78,15 @@ class DrawPanel extends JPanel implements MouseListener {
                 g.setColor(Color.white);
                 g.drawString("UPDATE CHANCES", 785, 346);
                 g.drawRect((int) updateChancesButton.getX(), (int) updateChancesButton.getY(), (int) updateChancesButton.getWidth(), (int) updateChancesButton.getHeight());
+
+                // Cheat mode button
+                g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                if (cheatModeEnabled) {
+                    g.setColor(Color.green);
+                }
+                g.drawString("CHEAT MODE", 807, 447);
+                g.drawRect((int) cheatModeButton.getX(), (int) cheatModeButton.getY(), (int) cheatModeButton.getWidth(), (int) cheatModeButton.getHeight());
+                g.setColor(Color.white);
 
                 // Rebirth button
                 if (highestRolledRarity != null && highestRolledRarity.getChance() / 20 > 0 && highestRolledRarity != rarities.getRarities().get(rarities.getRarities().size()-1) && !isDuplicateRebirth()) {
@@ -157,6 +168,15 @@ class DrawPanel extends JPanel implements MouseListener {
                 g.setColor(Color.white);
                 g.drawString("UPDATE CHANCES", 785, 346);
                 g.drawRect((int) updateChancesButton.getX(), (int) updateChancesButton.getY(), (int) updateChancesButton.getWidth(), (int) updateChancesButton.getHeight());
+
+                // Cheat mode button
+                g.setFont(new Font("Courier New", Font.PLAIN, 20));
+                if (cheatModeEnabled) {
+                    g.setColor(Color.green);
+                }
+                g.drawString("CHEAT MODE", 807, 447);
+                g.drawRect((int) cheatModeButton.getX(), (int) cheatModeButton.getY(), (int) cheatModeButton.getWidth(), (int) cheatModeButton.getHeight());
+                g.setColor(Color.white);
 
                 // Luck display and making sure luck doesn't exceed the maximum luck set by the program
                 if (rarities.getLuck() >= MAX_LUCK) {
@@ -248,6 +268,7 @@ class DrawPanel extends JPanel implements MouseListener {
                     progressionModeEnabled = true;
                     testLuckButton = new Rectangle(375, 200, 200, 30);
                     updateChancesButton = new Rectangle(770, 325, 200, 30);
+                    cheatModeButton = new Rectangle(790, 425, 160, 30);
                     rarities = new Rarities(1);
                     rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
                     sockets = new Rectangle[8];
@@ -265,6 +286,7 @@ class DrawPanel extends JPanel implements MouseListener {
                     progressionModeEnabled = false;
                     testLuckButton = new Rectangle(375, 200, 200, 30);
                     updateChancesButton = new Rectangle(770, 325, 200, 30);
+                    cheatModeButton = new Rectangle(790, 425, 160, 30);
                     rarities = new Rarities(1);
                     rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
                 }
@@ -272,7 +294,11 @@ class DrawPanel extends JPanel implements MouseListener {
             if (testLuckButton.contains(clicked)) {
                 //System.out.println(rarities.raritySimulation(luck, 1000000));
                 //System.out.println(rarities.raritySimulation(luck, 1000000, "Moonstone"));
-                for (int i = 0; i < numRollsPerClick; i++) {
+                int numRolls = numRollsPerClick;
+                if (cheatModeEnabled) {
+                    numRolls = 100;
+                }
+                for (int i = 0; i < numRolls; i++) {
                     if (progressionModeEnabled) {
                         rolledRarity = rarities.generateRandomRarity(rarities.getLuck(), currentGemIndexProgress);
                         totalRolls++;
@@ -311,6 +337,9 @@ class DrawPanel extends JPanel implements MouseListener {
         }
         if (updateChancesButton.contains(clicked)) {
             rarityPercentages = rarities.raritySimulation(rarities.getLuck(), STARTING_SIMULATION_TIMES, true);
+        }
+        if (cheatModeButton.contains(clicked)) {
+           cheatModeEnabled = !cheatModeEnabled;
         }
         if (rebirthButton != null && rebirthButton.contains(clicked) && highestRolledRarity != rarities.getRarities().get(rarities.getRarities().size()-1)) {
             if (!isDuplicateRebirth()) {
