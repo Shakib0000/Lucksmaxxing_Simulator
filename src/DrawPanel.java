@@ -276,7 +276,6 @@ class DrawPanel extends JPanel implements MouseListener {
                     if (progressionModeEnabled) {
                         rolledRarity = rarities.generateRandomRarity(rarities.getLuck(), currentGemIndexProgress);
                         totalRolls++;
-                        rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
                         if (highestRolledRarity == null || highestRolledRarity.getName().equals("NULL")) { // No rarity has been rolled yet, therefore no highest rarity
                             highestRolledRarity = rolledRarity;
                             totalRollsForHighestRarity = totalRolls;
@@ -307,6 +306,7 @@ class DrawPanel extends JPanel implements MouseListener {
                         }
                     }
                 }
+                rarities.setLuck(rarities.getLuck() + rolledRarity.getChance() / 100);
             }
         }
         if (updateChancesButton.contains(clicked)) {
@@ -316,7 +316,6 @@ class DrawPanel extends JPanel implements MouseListener {
             if (!isDuplicateRebirth()) {
                 rebirthedRarities.add(highestRolledRarity);
                 numRollsPerClick += highestRolledRarity.getChance() / 20;
-                rarities.setLuck(1);
                 rolledRarity = new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), -1);
                 highestRolledRarity = new Rarity(425, 180, "NULL", new Color(255, 255, 255), new Font("Courier New", Font.PLAIN, 40), -1);
                 currentGemIndexProgress = 0;
